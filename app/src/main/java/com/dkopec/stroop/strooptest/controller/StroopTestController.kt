@@ -1,9 +1,10 @@
 package com.dkopec.stroop.strooptest.controller
 
-import com.dkopec.stroop.strooptest.StroopTestActivity
+import com.dkopec.stroop.strooptest.MainActivity
 import com.dkopec.stroop.strooptest.model.Stimulus
 import com.dkopec.stroop.strooptest.model.StroopState
 import com.dkopec.stroop.strooptest.model.StroopTest
+import java.util.*
 
 class StroopTestController {
 
@@ -13,26 +14,28 @@ class StroopTestController {
 
     private val correctnessThreshold = 70;
 
-    private val activity: StroopTestActivity
+    private val activity: MainActivity
 
     private var currentPhase: Phase
 
     private var stroopTest: StroopTest
 
-    constructor(activity: StroopTestActivity) {
+    private var subjectUUID = UUID.randomUUID()
+
+    constructor(activity: MainActivity) {
         this.activity = activity
         this.currentPhase = Phase.DESCRIPTION
-        this.stroopTest = createTest()
+        this.stroopTest = createTest(false)
         initialize()
     }
 
     fun initialize() {
         this.currentPhase = Phase.DESCRIPTION
-        setupDescriptionMode()
+        setupDescriptionMode(true)
     }
 
     fun onStimulusSelected(stimulus: Stimulus) {
-        if (currentPhase!=Phase.ACTUAL_TEST && currentPhase!= Phase.PRE_TEST){
+        if (currentPhase != Phase.ACTUAL_TEST && currentPhase != Phase.PRE_TEST) {
             return
         }
         stroopTest.stimuliChosen(stimulus)
@@ -42,10 +45,10 @@ class StroopTestController {
 
     fun onConfirmButtonClicked() {
         when (currentPhase) {
-            Phase.ACTUAL_TEST -> setupDescriptionMode()
+            Phase.ACTUAL_TEST -> setupDescriptionMode(true)
             Phase.DESCRIPTION -> setupTestMode(true)
             Phase.PRE_TO_ACTUAL -> setupTestMode(false)
-            Phase.PRE_TO_DESC -> setupDescriptionMode()
+            Phase.PRE_TO_DESC -> setupDescriptionMode(false)
         }
     }
 
@@ -80,11 +83,14 @@ class StroopTestController {
     }
 
     private fun initilizeTest() {
-        this.stroopTest = createTest()
+        this.stroopTest = createTest(currentPhase == Phase.PRE_TEST)
         onNextStroopState(stroopTest.currentState())
     }
 
-    private fun createTest() = StroopTest(0, 1, 0)
+    private fun createTest(isTest: Boolean): StroopTest {
+        val dataSaver = StroopDataSaver(activity.application, subjectUUID, isTest);
+        return StroopTest(dataSaver, 10, 10, 5)
+    }
 
     private fun setupTestMode(test: Boolean) {
         if (test) {
@@ -98,10 +104,13 @@ class StroopTestController {
         initilizeTest()
     }
 
-    private fun setupDescriptionMode() {
+    private fun setupDescriptionMode(newSubject: Boolean) {
         currentPhase = Phase.DESCRIPTION
         activity.colorButtons(true)
         activity.displayDescription("Lorem ipsum...")
         activity.setConfirmButtonText("Start!")
+        if (newSubject) {
+            subjectUUID = UUID.randomUUID()
+        }
     }
 }

@@ -1,8 +1,11 @@
 package com.dkopec.stroop.strooptest.model
 
+import com.dkopec.stroop.strooptest.controller.StroopDataSaver
 import java.util.*
+import kotlin.collections.ArrayList
 
 class StroopTest(
+    private val dataSaver: StroopDataSaver,
     private val matchingStimuli: Int = 10,
     private val notMatchingStimuli: Int = 10,
     private val neutralStimuli: Int = 5
@@ -10,7 +13,6 @@ class StroopTest(
 
     private val stimuliList = createStimuli()
 
-    private val recordedStates: MutableList<StroopTestRecord> = ArrayList()
 
     private var currentState = generateState()
 
@@ -25,7 +27,7 @@ class StroopTest(
     fun stimuliChosen(stimulus: Stimulus) {
         val now = System.currentTimeMillis()
         val record = StroopTestRecord(currentState, stimulus, now - stateGeneratedTime)
-        recordedStates.add(record)
+        dataSaver.write(record)
         if (!record.isCorrect()) {
             failures++
         }
@@ -37,11 +39,11 @@ class StroopTest(
 
     fun getLength() = matchingStimuli + notMatchingStimuli + neutralStimuli
 
-    fun getCurrentSteps() = recordedStates.size
+    fun getCurrentSteps() = dataSaver.size()
 
-    fun getCorrectness() = if (recordedStates.isEmpty()) 100 else 100 - (100 * failures / getCurrentSteps())
+    fun getCorrectness() = if (dataSaver.size() == 0) 100 else 100 - (100 * failures / getCurrentSteps())
 
-    fun isFinished() = recordedStates.size == getLength()
+    fun isFinished() = dataSaver.size() == getLength()
 
     private fun generateState(): StroopState {
         return stimuliList[getCurrentSteps()]
