@@ -31,24 +31,26 @@
             <Button
                     android:layout_height="match_parent" android:id="@+id/upButton" android:layout_weight="0.2"
                     android:layout_width="0dp" android:textAlignment="center" android:layout_marginLeft="0dp"
-                    android:layout_marginRight="0dp"/>
+                    android:layout_marginRight="0dp" android:layout_marginBottom="0dp"/>
         </LinearLayout>
         <LinearLayout
                 android:orientation="horizontal"
                 android:layout_width="match_parent"
-                android:layout_height="70dp" android:gravity="center" android:weightSum="1"
+                android:layout_height="80dp" android:gravity="center" android:weightSum="1"
                 android:layout_weight="0.33">
             <Button
                     android:layout_width="0dp"
-                    android:layout_height="match_parent" android:id="@+id/leftButton" android:layout_weight="0.2"/>
+                    android:layout_height="match_parent" android:id="@+id/leftButton" android:layout_weight="0.2"
+                    android:layout_marginBottom="5dp" android:layout_marginTop="5dp"/>
             <Button
-                    android:layout_height="wrap_content" android:id="@+id/fakeButton" android:layout_weight="0.2"
-                    android:layout_width="0dp" android:textAlignment="center" android:layout_marginLeft="0dp"
-                    android:layout_marginRight="0dp" android:visibility="invisible"/>
+                    android:layout_width="0dp" android:textAlignment="center"
+                    android:layout_height="match_parent" android:id="@+id/fakeButton" android:layout_weight="0.2"
+                    android:visibility="invisible" android:layout_margin="10dp"/>
             <Button
                     android:layout_width="0dp"
                     android:layout_height="match_parent" android:id="@+id/rightButton" android:layout_weight="0.2"
-                    style="@style/Widget.AppCompat.Button"/>
+                    style="@style/Widget.AppCompat.Button" android:layout_marginTop="5dp"
+                    android:layout_marginBottom="5dp"/>
         </LinearLayout>
         <LinearLayout
                 android:orientation="horizontal"
