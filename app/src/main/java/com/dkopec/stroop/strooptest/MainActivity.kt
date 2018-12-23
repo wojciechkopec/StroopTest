@@ -1,12 +1,12 @@
 package com.dkopec.stroop.strooptest
 
-import android.Manifest
-import android.content.pm.PackageManager
+import android.Manifest.permission.WRITE_EXTERNAL_STORAGE
+import android.content.pm.PackageManager.PERMISSION_GRANTED
 import android.graphics.Color
-import android.opengl.Visibility
 import android.os.Bundle
-import android.support.v4.app.ActivityCompat
-import android.support.v4.content.ContextCompat
+import android.support.v4.app.ActivityCompat.requestPermissions
+import android.support.v4.app.ActivityCompat.shouldShowRequestPermissionRationale
+import android.support.v4.content.ContextCompat.checkSelfPermission
 import android.support.v7.app.AppCompatActivity
 import android.view.View
 import com.dkopec.stroop.strooptest.controller.StroopTestController
@@ -35,34 +35,14 @@ class MainActivity : AppCompatActivity() {
         requestPermissions()
     }
 
-    override fun onRequestPermissionsResult(requestCode: Int,
-                                            permissions: Array<String>, grantResults: IntArray) {
-        when (requestCode) {
-            7 -> {
-                // If request is cancelled, the result arrays are empty.
-                if ((grantResults.isNotEmpty() && grantResults[0] == PackageManager.PERMISSION_GRANTED)) {
-                    // permission was granted, yay! Do the
-                    // contacts-related task you need to do.
-                } else {
-                    // permission denied, boo! Disable the
-                    // functionality that depends on this permission.
-                }
-                return
-            }
-
-            // Add other 'when' lines to check for other
-            // permissions this app might request.
-            else -> {
-                // Ignore all other requests.
-            }
+    fun setStimuliState(state: StroopState?) {
+        if (state == null) {
+            stimulusTextView.visibility = View.INVISIBLE
+        } else {
+            stimulusTextView.text = state.stimulus.displayName
+            stimulusTextView.setTextColor(state.color)
+            stimulusTextView.visibility = View.VISIBLE
         }
-    }
-
-
-
-    fun setStimuliState(state: StroopState) {
-        stimuliTextView.text = state.stimulus.displayName
-        stimuliTextView.setTextColor(state.color)
     }
 
     fun colorButtons(color: Boolean) {
@@ -76,14 +56,14 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
-    fun updateResultsView() {
-        resultView.text = stroopTest.getStateDescription()
+    fun displayDescription(content: CharSequence?) {
+        descriptionTextView.setTextColor(Color.WHITE)
+        descriptionTextView.text = content
+
+        descriptionTextView.visibility = if (content != null) View.VISIBLE else View.INVISIBLE
+        showControllers(content == null)
     }
 
-    fun displayDescription(content: String) {
-        stimuliTextView.setTextColor(Color.WHITE)
-        stimuliTextView.text = content
-    }
 
     fun setConfirmButtonText(content: String?) {
         if (content == null) {
@@ -93,6 +73,12 @@ class MainActivity : AppCompatActivity() {
             confirmButton.text = content
             confirmButton.visibility = View.VISIBLE
         }
+    }
+
+    fun showControllers(show: Boolean) {
+        val visibility = if (show) View.VISIBLE else View.INVISIBLE
+//        buttonsLayout.visibility = visibility
+        stimulusTextView.visibility = visibility
     }
 
     private fun onButtonSelected(button: View) {
@@ -112,22 +98,9 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun requestPermissions() {
-        if (ContextCompat.checkSelfPermission(
-                this,
-                Manifest.permission.WRITE_EXTERNAL_STORAGE
-            ) != PackageManager.PERMISSION_GRANTED
-        ) {
-
-            // Permission is not granted
-            // Should we show an explanation?
-            if (ActivityCompat.shouldShowRequestPermissionRationale(this, Manifest.permission.WRITE_EXTERNAL_STORAGE)) {
-                // Show an explanation to the user *asynchronously* -- don't block
-                // this thread waiting for the user's response! After the user
-                // sees the explanation, try again to request the permission.
-            } else {
-                // No explanation needed, we can request the permission.
-                ActivityCompat.requestPermissions(this, arrayOf(Manifest.permission.WRITE_EXTERNAL_STORAGE), 7)
-
+        if (checkSelfPermission(this, WRITE_EXTERNAL_STORAGE) != PERMISSION_GRANTED) {
+            if (!shouldShowRequestPermissionRationale(this, WRITE_EXTERNAL_STORAGE)) {
+                requestPermissions(this, arrayOf(WRITE_EXTERNAL_STORAGE), 7)
             }
         }
     }

@@ -4,9 +4,9 @@ data class StroopState(val stimulus: Stimulus, val color: Int) {
 
     fun type(): String {
         if (stimulus == Stimulus.NEUTRAL) {
-            return "NEUTRAL"
+            return "N"
         } else {
-            return if (stimulus.color == color) "MATCHING" else "NOT_MATCHING"
+            return if (stimulus.color == color) "C" else "I"
         }
     }
 }

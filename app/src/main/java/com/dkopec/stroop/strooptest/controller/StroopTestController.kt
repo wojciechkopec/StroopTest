@@ -1,6 +1,8 @@
 package com.dkopec.stroop.strooptest.controller
 
+import android.text.Html
 import com.dkopec.stroop.strooptest.MainActivity
+import com.dkopec.stroop.strooptest.R
 import com.dkopec.stroop.strooptest.model.Stimulus
 import com.dkopec.stroop.strooptest.model.StroopState
 import com.dkopec.stroop.strooptest.model.StroopTest
@@ -39,7 +41,6 @@ class StroopTestController {
             return
         }
         stroopTest.stimuliChosen(stimulus)
-        activity.updateResultsView()
         onNextStroopState(stroopTest.currentState())
     }
 
@@ -66,30 +67,32 @@ class StroopTestController {
     private fun onTestFinished() {
         if (currentPhase == Phase.PRE_TEST) {
             if (stroopTest.getCorrectness() >= correctnessThreshold) {
-                activity.displayDescription("Test pomyślny, przejdź do właściwego")
-                activity.setConfirmButtonText("Dalej")
+                activity.displayDescription(activity.getString(R.string.text_trial_success))
                 currentPhase = Phase.PRE_TO_ACTUAL;
 
             } else {
-                activity.displayDescription("Test niepomyslny, wróć")
-                activity.setConfirmButtonText("Wróć")
+                activity.displayDescription(activity.getString(R.string.text_trial_failure))
                 currentPhase = Phase.PRE_TO_DESC
             }
-            return;
         } else {
-            activity.displayDescription("Koniec, dzięki")
-            activity.setConfirmButtonText("Od początku")
+            activity.displayDescription(activity.getString(R.string.text_test_finished))
         }
+        activity.setConfirmButtonText(activity.getString(R.string.text_button_start))
     }
 
     private fun initilizeTest() {
         this.stroopTest = createTest(currentPhase == Phase.PRE_TEST)
+        activity.displayDescription(null)
         onNextStroopState(stroopTest.currentState())
     }
 
     private fun createTest(isTest: Boolean): StroopTest {
         val dataSaver = StroopDataSaver(activity.application, subjectUUID, isTest);
-        return StroopTest(dataSaver, 10, 10, 5)
+        if (isTest) {
+            return StroopTest(dataSaver, 10, 10, 5)
+        } else {
+            return StroopTest(dataSaver, 40, 40, 20)
+        }
     }
 
     private fun setupTestMode(test: Boolean) {
@@ -99,7 +102,7 @@ class StroopTestController {
             currentPhase = Phase.ACTUAL_TEST
         }
         activity.colorButtons(false)
-        activity.displayDescription("")
+        activity.displayDescription(null)
         activity.setConfirmButtonText(null)
         initilizeTest()
     }
@@ -107,8 +110,9 @@ class StroopTestController {
     private fun setupDescriptionMode(newSubject: Boolean) {
         currentPhase = Phase.DESCRIPTION
         activity.colorButtons(true)
-        activity.displayDescription("Lorem ipsum...")
-        activity.setConfirmButtonText("Start!")
+        activity.displayDescription(Html.fromHtml(activity.getString(R.string.text_description)))
+        activity.setConfirmButtonText(activity.getString(R.string.text_button_start))
+        activity.setStimuliState(null)
         if (newSubject) {
             subjectUUID = UUID.randomUUID()
         }

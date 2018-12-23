@@ -34,6 +34,8 @@ class StroopTest(
         stateGeneratedTime = now
         if (!isFinished()) {
             currentState = generateState()
+        }else{
+            dataSaver.writeSummary()
         }
     }
 
